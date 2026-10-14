@@ -111,6 +111,70 @@ void *s21_memcpy(void *Dst, const void *Src, s21_size num) {
     return Dst; 
 }
 
+// 8. STRNCPY
+char *s21_strncpy(char *dst, const char *src, s21_size num) {
+
+
+    s21_size i = 0; 
+
+    while (i < num && src[i] != '\0') {
+
+        dst[i] = src[i]; 
+        i++; 
+
+    }
+
+    while (i < num) {
+        dst[i] = '\0'; 
+        i++; 
+    }
+
+    return dst; 
+
+}
+
+// 9. STRNCAT 
+char *s21_strncat(char *dst, const char *src, s21_size num) {
+
+    s21_size i = 0; 
+    while (dst[i] != '\0') {
+        i++; 
+    }
+
+    s21_size a = 0; 
+    while (a < num && src[a] != '\0') {
+        dst[i] = src[a]; 
+        i++; 
+        a++; 
+    }
+
+    dst[i] = '\0'; 
+
+    return dst; 
+
+}
+
+// 10. STRNCMP
+int s21_strncmp(const char *str1, const char *str2, s21_size num) {
+
+    s21_size i = 0; 
+
+    while (i < num) {
+
+        if (str1[i] != str2[i]) {
+            return str1[i] - str2[i]; 
+        }
+
+        if (str1[i] == '\0') {
+            return 0; 
+        }
+
+        i++; 
+    }
+
+    return 0; 
+
+}
 
 
 

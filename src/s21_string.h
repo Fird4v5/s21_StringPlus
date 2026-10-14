@@ -14,5 +14,9 @@ void *s21_memset(void *Dst, int val, s21_size num);
 void *s21_memchr(const void *Buff, int Val, s21_size num);
 int s21_memcmp(const void *Buff1, const void *Buff2, s21_size num); 
 void *s21_memcpy(void *Dst, const void *Src, s21_size num);
+char *s21_strncpy(char *dst, const char *src, s21_size num);
+char *s21_strncat(char *dst, const char *src, s21_size num); 
+int s21_strncmp(const char *str1, const char *str2, s21_size num); 
+
 
 #endif
