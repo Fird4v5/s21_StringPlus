@@ -17,6 +17,9 @@ void *s21_memcpy(void *Dst, const void *Src, s21_size num);
 char *s21_strncpy(char *dst, const char *src, s21_size num);
 char *s21_strncat(char *dst, const char *src, s21_size num); 
 int s21_strncmp(const char *str1, const char *str2, s21_size num); 
+s21_size s21_strcspn(const char *str, const char *set);
+char *s21_strpbrk(const char *str, const char *set);  
+char *s21_strstr(const char *haystack, const char *needle) ; 
 
 
 #endif

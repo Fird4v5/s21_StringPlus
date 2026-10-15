@@ -177,4 +177,75 @@ int s21_strncmp(const char *str1, const char *str2, s21_size num) {
 }
 
 
+// 11. STRCSPN 
+s21_size s21_strcspn(const char *str, const char *set) {
+
+    s21_size count = 0; 
+   
+    while (str[count] != '\0') {
+
+        s21_size j = 0; 
+
+        while (set[j] != '\0') {
+
+            if (str[count] == set[j]) {
+                return count; 
+            }
+            j++;  
+        }
+
+        count++; 
+
+    }
+
+    return count;
+
+}
+
+// 12. STRPBRK
+char *s21_strpbrk(const char *str, const char *set) {
+
+    s21_size i = 0; 
+    while (str[i] != '\0') {
+
+        s21_size j = 0; 
+        while (set[j] != '\0') {
+            if (str[i] == set[j]) {
+                return (char *)&str[i]; 
+            }
+            j++; 
+        }
+
+        i++; 
+    }
+
+    return S21_NULL;  
+
+}
+
+// 13. STRSTR 
+char *s21_strstr(const char *haystack, const char *needle) {
+
+    if (needle[0] == '\0') {
+        return (char *)haystack; 
+    }
+
+     
+    for (s21_size i = 0; haystack[i] != '\0'; i++) {
+
+        s21_size j = 0; 
+        while (needle[j] != '\0' && needle[j] == haystack[i + j]) {
+            j++; 
+        }
+
+        if (needle[j] == '\0') {
+            return (char *)&haystack[i]; 
+        }
+
+    }
+
+    return S21_NULL; 
+
+}
+
 
