@@ -19,7 +19,9 @@ char *s21_strncat(char *dst, const char *src, s21_size num);
 int s21_strncmp(const char *str1, const char *str2, s21_size num); 
 s21_size s21_strcspn(const char *str, const char *set);
 char *s21_strpbrk(const char *str, const char *set);  
-char *s21_strstr(const char *haystack, const char *needle) ; 
+char *s21_strstr(const char *haystack, const char *needle);
+char *s21_strtok(char *str, const char *delimiter);
+char *s21_strerror(int errnum); 
 
 
 #endif
