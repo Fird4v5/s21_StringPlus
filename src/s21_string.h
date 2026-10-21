@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <stdarg.h>
 
 typedef size_t s21_size; 
 #define S21_NULL ((void *)0)
@@ -22,6 +23,7 @@ char *s21_strpbrk(const char *str, const char *set);
 char *s21_strstr(const char *haystack, const char *needle);
 char *s21_strtok(char *str, const char *delimiter);
 char *s21_strerror(int errnum); 
+int s21_sprintf(char *str, const char *format, ...); 
 
 
 #endif

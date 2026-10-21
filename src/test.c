@@ -222,6 +222,103 @@ START_TEST(test_strtok_basic) {
 }
 END_TEST
 
+
+/* Helper: compare s21_sprintf with standard sprintf */
+#define CHECK_SPRINTF(format, ...)                         \
+    do {                                                   \
+        char expected[1024];                               \
+        char actual[1024];                                 \
+        int expected_len = sprintf(expected, format,        \
+                                   ##__VA_ARGS__);          \
+        int actual_len = s21_sprintf(actual, format,        \
+                                     ##__VA_ARGS__);        \
+        ck_assert_int_eq(actual_len, expected_len);         \
+        ck_assert_str_eq(actual, expected);                 \
+    } while (0)
+
+START_TEST(test_sprintf_plain_text) {
+    CHECK_SPRINTF("Hello, world!");
+    CHECK_SPRINTF("Hello %s", "Firdavs");
+}
+END_TEST
+
+START_TEST(test_sprintf_percent) {
+    CHECK_SPRINTF("100%%");
+    CHECK_SPRINTF("%% %% %%");
+}
+END_TEST
+
+START_TEST(test_sprintf_char) {
+    CHECK_SPRINTF("%c", 'A');
+    CHECK_SPRINTF("%5c", 'X');
+    CHECK_SPRINTF("%-5c", 'X');
+}
+END_TEST
+
+START_TEST(test_sprintf_string) {
+    CHECK_SPRINTF("%s", "hello");
+    CHECK_SPRINTF("%10s", "hello");
+    CHECK_SPRINTF("%-10s", "hello");
+    CHECK_SPRINTF("%.3s", "hello");
+    CHECK_SPRINTF("%8.3s", "hello");
+    CHECK_SPRINTF("%-8.3s", "hello");
+}
+END_TEST
+
+START_TEST(test_sprintf_signed_integer) {
+    CHECK_SPRINTF("%d", 123);
+    CHECK_SPRINTF("%d", -123);
+    CHECK_SPRINTF("%+d", 123);
+    CHECK_SPRINTF("% d", 123);
+    CHECK_SPRINTF("%8d", 123);
+    CHECK_SPRINTF("%-8d", 123);
+    CHECK_SPRINTF("%.5d", 123);
+    CHECK_SPRINTF("%8.5d", 123);
+    CHECK_SPRINTF("%hd", (short)123);
+    CHECK_SPRINTF("%ld", 123456L);
+}
+END_TEST
+
+START_TEST(test_sprintf_unsigned_integer) {
+    CHECK_SPRINTF("%u", 123U);
+    CHECK_SPRINTF("%u", 0U);
+    CHECK_SPRINTF("%8u", 123U);
+    CHECK_SPRINTF("%-8u", 123U);
+    CHECK_SPRINTF("%.5u", 123U);
+    CHECK_SPRINTF("%hu", (unsigned short)123);
+    CHECK_SPRINTF("%lu", 123456UL);
+}
+END_TEST
+
+START_TEST(test_sprintf_float) {
+    CHECK_SPRINTF("%f", 3.14159);
+    CHECK_SPRINTF("%.2f", 3.14159);
+    CHECK_SPRINTF("%10.2f", 3.14159);
+    CHECK_SPRINTF("%-10.2f", 3.14159);
+    CHECK_SPRINTF("%+f", 3.14159);
+    CHECK_SPRINTF("% f", 3.14159);
+    CHECK_SPRINTF("%.0f", 3.6);
+    CHECK_SPRINTF("%f", -3.14159);
+}
+END_TEST
+
+START_TEST(test_sprintf_mixed_format) {
+    CHECK_SPRINTF("%s: %d, %.2f, %c, %u",
+                  "Values", -42, 3.14159, 'Z', 100U);
+    CHECK_SPRINTF("Name=%-8s score=%+5d", "Alex", 42);
+}
+END_TEST
+
+START_TEST(test_sprintf_zero_and_precision) {
+    CHECK_SPRINTF("%d", 0);
+    CHECK_SPRINTF("%.0d", 0);
+    CHECK_SPRINTF("%.0u", 0U);
+    CHECK_SPRINTF("%.3f", 0.0);
+    CHECK_SPRINTF("%5.0f", 3.0);
+}
+END_TEST
+
+
 int main(void) {
     Suite *suite = suite_create("s21_string");
     TCase *test_case = tcase_create("required_functions");
@@ -243,6 +340,15 @@ int main(void) {
     tcase_add_test(test_case, test_strrchr_basic);
     tcase_add_test(test_case, test_strstr_basic);
     tcase_add_test(test_case, test_strtok_basic);
+    tcase_add_test(test_case, test_sprintf_plain_text);
+    tcase_add_test(test_case, test_sprintf_percent);
+    tcase_add_test(test_case, test_sprintf_char);
+    tcase_add_test(test_case, test_sprintf_string);
+    tcase_add_test(test_case, test_sprintf_signed_integer);
+    tcase_add_test(test_case, test_sprintf_unsigned_integer);
+    tcase_add_test(test_case, test_sprintf_float);
+    tcase_add_test(test_case, test_sprintf_mixed_format);
+    tcase_add_test(test_case, test_sprintf_zero_and_precision);
 
     suite_add_tcase(suite, test_case);
 
@@ -254,3 +360,5 @@ int main(void) {
 
     return failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }
+
+

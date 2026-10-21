@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "s21_string.h"
 #include <errno.h>
 
@@ -560,4 +562,374 @@ static char unknown_message[64];
     snprintf(unknown_message, sizeof(unknown_message), "Unknown error %d", errnum);
 
     return unknown_message; 
+}
+
+// 16. SPRINTF
+static void s21_put_char(char **out, int *count, char c) {
+    *(*out)++ = c;
+    (*count)++;
+}
+
+static void s21_put_repeat(char **out, int *count, char c, int n) {
+    while (n-- > 0) {
+        s21_put_char(out, count, c);
+    }
+}
+
+static int s21_parse_number(const char **p) {
+    int value = 0;
+
+    while (**p >= '0' && **p <= '9') {
+        int digit = **p - '0';
+
+        if (value > (INT_MAX - digit) / 10) {
+            value = INT_MAX;
+        } else {
+            value = value * 10 + digit;
+        }
+
+        (*p)++;
+    }
+
+    return value;
+}
+
+static int s21_unsigned_to_string(unsigned long long value,
+                                  char *buffer) {
+    char reverse[32];
+    int len = 0;
+
+    do {
+        reverse[len++] = (char)('0' + value % 10);
+        value /= 10;
+    } while (value != 0);
+
+    for (int i = 0; i < len; i++) {
+        buffer[i] = reverse[len - 1 - i];
+    }
+
+    buffer[len] = '\0';
+    return len;
+}
+
+static void s21_emit_field(char **out, int *count,
+                           const char *text, int len,
+                           char sign, int width, int left,
+                           int zero_pad) {
+    int total = len + (sign != '\0');
+    int padding = width > total ? width - total : 0;
+
+    if (!left && !zero_pad) {
+        s21_put_repeat(out, count, ' ', padding);
+    }
+
+    if (sign != '\0') {
+        s21_put_char(out, count, sign);
+    }
+
+    if (!left && zero_pad) {
+        s21_put_repeat(out, count, '0', padding);
+    }
+
+    for (int i = 0; i < len; i++) {
+        s21_put_char(out, count, text[i]);
+    }
+
+    if (left) {
+        s21_put_repeat(out, count, ' ', padding);
+    }
+}
+
+static void s21_emit_integer(char **out, int *count,
+                             unsigned long long value,
+                             char sign, int width, int precision,
+                             int precision_set, int left,
+                             int zero_flag, int is_zero) {
+    char digits[32];
+    int len = s21_unsigned_to_string(value, digits);
+
+    if (precision_set && precision == 0 && is_zero) {
+        len = 0;
+    }
+
+    int zeros = precision_set && precision > len
+                    ? precision - len
+                    : 0;
+
+    char result[64];
+    int result_len = 0;
+
+    while (zeros-- > 0) {
+        result[result_len++] = '0';
+    }
+
+    for (int i = 0; i < len; i++) {
+        result[result_len++] = digits[i];
+    }
+
+    result[result_len] = '\0';
+
+    /*
+     * Integer precision overrides the zero-padding flag.
+     */
+    int use_zero_pad = zero_flag && !left && !precision_set;
+
+    s21_emit_field(out, count, result, result_len,
+                   sign, width, left, use_zero_pad);
+}
+
+static void s21_emit_float(char **out, int *count,
+                           double value, char sign,
+                           int width, int precision,
+                           int left, int zero_flag) {
+    /*
+     * This implementation uses an integer/fraction split and
+     * rounds the fractional part. Extremely large values and
+     * extreme precisions are outside this simple implementation's
+     * safe range.
+     */
+    if (precision < 0) {
+        precision = 6;
+    }
+
+    if (precision > 18) {
+        precision = 18;
+    }
+
+    if (value < 0.0) {
+        sign = '-';
+        value = -value;
+    }
+
+    unsigned long long whole = (unsigned long long)value;
+    long double fraction = (long double)value - (long double)whole;
+
+    unsigned long long scale = 1;
+    for (int i = 0; i < precision; i++) {
+        scale *= 10;
+    }
+
+    unsigned long long fractional =
+    (unsigned long long)(fraction * (long double)scale + 0.5L);
+
+    if (fractional >= scale) {
+    whole++;
+    fractional -= scale;
+    }
+
+    char whole_text[32];
+    int whole_len = s21_unsigned_to_string(whole, whole_text);
+
+    char result[64];
+    int result_len = 0;
+
+    for (int i = 0; i < whole_len; i++) {
+        result[result_len++] = whole_text[i];
+    }
+
+    if (precision > 0) {
+        result[result_len++] = '.';
+
+        unsigned long long divisor = scale / 10;
+        for (int i = 0; i < precision; i++) {
+            result[result_len++] =
+                (char)('0' + (fractional / divisor) % 10);
+
+            if (divisor > 1) {
+                divisor /= 10;
+            }
+        }
+    }
+
+    result[result_len] = '\0';
+
+    s21_emit_field(out, count, result, result_len,
+                   sign, width, left, zero_flag && !left);
+}
+
+int s21_sprintf(char *str, const char *format, ...) {
+    if (str == NULL || format == NULL) {
+        return -1;
+    }
+
+    char *out = str;
+    int count = 0;
+
+    va_list args;
+    va_start(args, format);
+
+    const char *p = format;
+
+    while (*p != '\0') {
+        if (*p != '%') {
+            s21_put_char(&out, &count, *p++);
+            continue;
+        }
+
+        p++;
+
+        if (*p == '%') {
+            s21_put_char(&out, &count, '%');
+            p++;
+            continue;
+        }
+
+        int left = 0;
+        int plus = 0;
+        int space = 0;
+        int zero_flag = 0;
+
+        /* Flags */
+        int parsing_flags = 1;
+        while (parsing_flags) {
+            switch (*p) {
+                case '-': left = 1; p++; break;
+                case '+': plus = 1; p++; break;
+                case ' ': space = 1; p++; break;
+                case '0': zero_flag = 1; p++; break;
+                default: parsing_flags = 0; break;
+            }
+        }
+
+        /* Numeric width */
+        int width = 0;
+        if (*p >= '0' && *p <= '9') {
+            width = s21_parse_number(&p);
+        }
+
+        /* Numeric precision */
+        int precision = 0;
+        int precision_set = 0;
+
+        if (*p == '.') {
+            precision_set = 1;
+            p++;
+
+            if (*p >= '0' && *p <= '9') {
+                precision = s21_parse_number(&p);
+            }
+        }
+
+        /* Length modifier */
+        char length = '\0';
+        if (*p == 'h' || *p == 'l') {
+            length = *p;
+            p++;
+        }
+
+        char conversion = *p;
+        if (conversion == '\0') {
+            break;
+        }
+        p++;
+
+        char sign = '\0';
+        if (plus) {
+            sign = '+';
+        } else if (space) {
+            sign = ' ';
+        }
+
+        switch (conversion) {
+            case 'c': {
+                char c = (char)va_arg(args, int);
+                int padding = width > 1 ? width - 1 : 0;
+
+                if (!left) {
+                    s21_put_repeat(&out, &count, ' ', padding);
+                }
+
+                s21_put_char(&out, &count, c);
+
+                if (left) {
+                    s21_put_repeat(&out, &count, ' ', padding);
+                }
+                break;
+            }
+
+            case 's': {
+                const char *value = va_arg(args, const char *);
+                if (value == NULL) {
+                    value = "(null)";
+                }
+
+                int len = 0;
+                while (value[len] != '\0' &&
+                       (!precision_set || len < precision)) {
+                    len++;
+                }
+
+                s21_emit_field(&out, &count, value, len,
+                               '\0', width, left, 0);
+                break;
+            }
+
+            case 'd': {
+                long long value;
+
+                if (length == 'l') {
+                    value = va_arg(args, long);
+                } else if (length == 'h') {
+                    value = (short)va_arg(args, int);
+                } else {
+                    value = va_arg(args, int);
+                }
+
+                unsigned long long magnitude;
+                if (value < 0) {
+                    sign = '-';
+                    magnitude = (unsigned long long)(-(value + 1)) + 1;
+                } else {
+                    magnitude = (unsigned long long)value;
+                }
+
+                s21_emit_integer(&out, &count, magnitude, sign,
+                                 width, precision, precision_set,
+                                 left, zero_flag, magnitude == 0);
+                break;
+            }
+
+            case 'u': {
+                unsigned long long value;
+
+                if (length == 'l') {
+                    value = va_arg(args, unsigned long);
+                } else if (length == 'h') {
+                    value = (unsigned short)va_arg(args, int);
+                } else {
+                    value = va_arg(args, unsigned int);
+                }
+
+                s21_emit_integer(&out, &count, value, '\0',
+                                 width, precision, precision_set,
+                                 left, zero_flag, value == 0);
+                break;
+            }
+
+            case 'f': {
+                double value = va_arg(args, double);
+
+                if (value < 0.0) {
+                    sign = '-';
+                }
+
+                s21_emit_float(&out, &count, value, sign,
+                               width,
+                               precision_set ? precision : 6,
+                               left, zero_flag);
+                break;
+            }
+
+            default:
+                /* Unknown conversion: preserve the format text. */
+                s21_put_char(&out, &count, '%');
+                s21_put_char(&out, &count, conversion);
+                break;
+        }
+    }
+
+    *out = '\0';
+    va_end(args);
+
+    return count;
 }
