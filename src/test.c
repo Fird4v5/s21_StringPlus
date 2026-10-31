@@ -86,6 +86,104 @@ START_TEST(test_strrchr_unsigned_char) {
 END_TEST
 
 
+// -----> STRCMP 
+
+START_TEST(test_strcmp_equal) {
+    ck_assert_int_eq(s21_strcmp("Hello", "Hello"), strcmp("Hello", "Hello")); 
+}
+END_TEST
+
+START_TEST(test_strcmp_different) {
+    ck_assert_int_lt(s21_strcmp("apple", "apply"), 0); 
+    ck_assert_int_lt(strcmp("apple", "apply"), 0); 
+}
+END_TEST
+
+START_TEST(test_strcmp_reverse) {
+    ck_assert_int_gt(s21_strcmp("zebra", "apple"), 0); 
+    ck_assert_int_gt(strcmp("zebra", "apple"), 0); 
+}
+END_TEST
+
+START_TEST(test_strcmp_first_shorter) {
+    ck_assert_int_lt(s21_strcmp("cat", "caterpillar"), 0); 
+    ck_assert_int_lt(strcmp("cat", "caterpillar"), 0); 
+}
+END_TEST
+
+START_TEST(test_strcmp_second_shorter) {
+    ck_assert_int_gt(s21_strcmp("caterpillar", "cat"), 0);
+    ck_assert_int_gt(strcmp("caterpillar", "cat"), 0);  
+}
+END_TEST
+
+START_TEST(test_strcmp_empty) {
+    ck_assert_int_eq(s21_strcmp("", ""), strcmp("", "")); 
+}
+END_TEST
+
+START_TEST(test_strcmp_one_empty) {
+    ck_assert_int_lt(s21_strcmp("", "Hello"), 0);
+    ck_assert_int_lt(strcmp("", "Hello"), 0); 
+}
+END_TEST
+
+START_TEST(test_strcmp_unsigned_char) {
+    char str[] = {(char)0xFF, '\0'}; 
+
+    ck_assert_int_gt(s21_strcmp(str, "A"), 0); 
+    ck_assert_int_gt(strcmp(str, "A"), 0); 
+}
+END_TEST
+
+
+// -----> strncmp 
+
+START_TEST(test_strncmp_equal) {
+    ck_assert_int_eq(s21_strncmp("Hello", "Hello", 5), strncmp("Hello", "Hello", 5)); 
+}
+END_TEST 
+
+START_TEST(test_strncmp_different) {
+    ck_assert_int_lt(s21_strncmp("apple", "apply", 5), 0);
+    ck_assert_int_lt(strncmp("apple", "apply", 5), 0); 
+}
+END_TEST
+
+START_TEST(test_strncmp_num_shorter) {
+    ck_assert_int_eq(s21_strncmp("apple", "apply", 4), strncmp("apple", "apply", 4));
+}
+END_TEST
+
+START_TEST(test_strncmp_first_shorter) {
+    ck_assert_int_lt(s21_strncmp("cat", "caterpillar", 10), 0);
+    ck_assert_int_lt(strncmp("cat", "caterpillar", 10), 0);  
+}
+END_TEST
+
+START_TEST(test_strncmp_second_shorter) {
+    ck_assert_int_gt(s21_strncmp("caterpillar", "cat", 10), 0); 
+    ck_assert_int_gt(strncmp("caterpillar", "cat", 10), 0); 
+}
+END_TEST
+
+START_TEST(test_strncmp_num_zero) {
+    ck_assert_int_eq(s21_strncmp("apple", "apply", 0), strncmp("apple", "apply", 0)); 
+}
+END_TEST
+
+
+START_TEST(test_strncmp_empty) {
+    ck_assert_int_eq(s21_strncmp("", "", 5), strncmp("", "", 5));
+}
+END_TEST
+
+START_TEST(test_strncmp_unsigned_char) {
+    char str[] = {(char)0xFF, '\0'};
+    ck_assert_int_gt(s21_strncmp(str, "A", 1), 0);
+    ck_assert_int_gt(strncmp(str, "A", 1), 0); 
+}
+END_TEST
 
 // ===== SUITE / TCASE ===== 
 
@@ -96,6 +194,8 @@ Suite *s21_string_suite(void) {
     TCase *tc_strlen = tcase_create("strlen_tests"); 
     TCase *tc_strchr = tcase_create("strchr_tests"); 
     TCase *tc_strrchr = tcase_create("strrchr_tests"); 
+    TCase *tc_strcmp = tcase_create("strcmp_tests"); 
+    TCase *tc_strncmp = tcase_create("strncmp_tests"); 
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
     tcase_add_test(tc_strlen, test_strlen_empty);
@@ -113,10 +213,29 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strrchr, test_strrchr_c_found_once); 
     tcase_add_test(tc_strrchr, test_strrchr_unsigned_char); 
 
+    tcase_add_test(tc_strcmp, test_strcmp_equal); 
+    tcase_add_test(tc_strcmp, test_strcmp_different); 
+    tcase_add_test(tc_strcmp, test_strcmp_reverse); 
+    tcase_add_test(tc_strcmp, test_strcmp_first_shorter); 
+    tcase_add_test(tc_strcmp, test_strcmp_second_shorter); 
+    tcase_add_test(tc_strcmp, test_strcmp_empty); 
+    tcase_add_test(tc_strcmp, test_strcmp_one_empty); 
+    tcase_add_test(tc_strcmp, test_strcmp_unsigned_char); 
+
+    tcase_add_test(tc_strncmp, test_strncmp_equal); 
+    tcase_add_test(tc_strncmp, test_strncmp_different); 
+    tcase_add_test(tc_strncmp, test_strncmp_num_shorter); 
+    tcase_add_test(tc_strncmp, test_strncmp_first_shorter); 
+    tcase_add_test(tc_strncmp, test_strncmp_second_shorter); 
+    tcase_add_test(tc_strncmp, test_strncmp_num_zero);
+    tcase_add_test(tc_strncmp, test_strncmp_empty); 
+    tcase_add_test(tc_strncmp, test_strncmp_unsigned_char);
 
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
-    suite_add_tcase(suite, tc_strrchr); 
+    suite_add_tcase(suite, tc_strrchr);
+    suite_add_tcase(suite, tc_strcmp); 
+    suite_add_tcase(suite, tc_strncmp);  
 
     return suite; 
 }

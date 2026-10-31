@@ -14,6 +14,8 @@ typedef size_t s21_size;
 s21_size s21_strlen(const char *str); 
 char *s21_strchr(const char *str, int c); 
 char *s21_strrchr(const char *str, int c); 
+int s21_strcmp(const char *str1, const char *str2); 
+int s21_strncmp(const char *str1, const char *str2, s21_size num); 
 
 
 #endif
