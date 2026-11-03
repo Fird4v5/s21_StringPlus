@@ -126,21 +126,15 @@ char *s21_strncpy(char *dest, const char *src, s21_size num) {
   
   s21_size i = 0;
 
-  while (i < num) {
-
-      if (src[i] != '\0') {
-        dest[i] = src[i]; 
-      }
-
+  while (i < num && src[i] != '\0') { 
+    dest[i] = src[i]; 
     i++;
-
   }
 
-  if (src[i] == '\0') {
-    while (i < num) {
-      dest[i] = '\0'; 
-      i++; 
-    }
+
+  while (i < num) {
+    dest[i] = '\0'; 
+    i++; 
   }
 
   return dest; 

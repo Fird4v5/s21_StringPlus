@@ -185,6 +185,94 @@ START_TEST(test_strncmp_unsigned_char) {
 }
 END_TEST
 
+
+// -----> strncpy 
+
+
+
+START_TEST(test_strncpy_equal_size) {
+
+    char actual[10] = {0}; 
+    char expected[10] = {0}; 
+
+    s21_strncpy(actual, "Hello", 5); 
+    memcpy(expected, "Hello", 5); 
+
+    ck_assert_mem_eq(actual, expected, 10); 
+
+}
+END_TEST
+
+START_TEST(test_strncpy_limited) {
+
+    char actual[10] = {0}; 
+    char expected[10] = {0}; 
+
+    s21_strncpy(actual, "Hello", 3); 
+    memcpy(expected, "Hello", 3); 
+
+    ck_assert_mem_eq(actual, expected, 3);
+
+}
+END_TEST
+
+START_TEST(test_strncpy_src_shorter) {
+
+    char actual[10] = {0}; 
+    char expected[10] = {0}; 
+
+    s21_strncpy(actual, "Hi", 5); 
+    strncpy(expected, "Hi", 5); 
+
+    ck_assert_mem_eq(actual, expected, 5); 
+
+}
+END_TEST 
+
+
+START_TEST(test_strncpy_zero_limit) {
+    
+    char actual[10] = "Original"; 
+    char expected[10] = "Original"; 
+
+    s21_strncpy(actual, "Hello", 0); 
+
+    ck_assert_mem_eq(actual, expected, 10); 
+
+}
+END_TEST
+
+
+START_TEST(test_strncpy_src_empty) {
+
+    char actual[10] = {0}; 
+    char expected[10] = {0}; 
+
+    s21_strncpy(actual, "", 5); 
+    strncpy(expected, "", 5); 
+
+    ck_assert_mem_eq(actual, expected, 5); 
+
+}
+END_TEST
+
+START_TEST(test_strncpy_no_extra_null) {
+
+    char actual[10]; 
+    char expected[10]; 
+
+    memset(actual, 'X', 10); 
+    memset(expected, 'X', 10); 
+
+    s21_strncpy(actual, "Hello", 5); 
+    memcpy(expected, "Hello", 5); 
+
+    ck_assert_mem_eq(actual, expected, 10); 
+
+}
+END_TEST
+
+
 // ===== SUITE / TCASE ===== 
 
 Suite *s21_string_suite(void) {
@@ -196,6 +284,7 @@ Suite *s21_string_suite(void) {
     TCase *tc_strrchr = tcase_create("strrchr_tests"); 
     TCase *tc_strcmp = tcase_create("strcmp_tests"); 
     TCase *tc_strncmp = tcase_create("strncmp_tests"); 
+    TCase *tc_strncpy = tcase_create("strncpy_tests"); 
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
     tcase_add_test(tc_strlen, test_strlen_empty);
@@ -231,11 +320,19 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strncmp, test_strncmp_empty); 
     tcase_add_test(tc_strncmp, test_strncmp_unsigned_char);
 
+    tcase_add_test(tc_strncpy, test_strncpy_equal_size); 
+    tcase_add_test(tc_strncpy, test_strncpy_limited);
+    tcase_add_test(tc_strncpy, test_strncpy_src_shorter);
+    tcase_add_test(tc_strncpy, test_strncpy_zero_limit); 
+    tcase_add_test(tc_strncpy, test_strncpy_src_empty);
+    tcase_add_test(tc_strncpy, test_strncpy_no_extra_null);
+
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
     suite_add_tcase(suite, tc_strrchr);
     suite_add_tcase(suite, tc_strcmp); 
     suite_add_tcase(suite, tc_strncmp);  
+    suite_add_tcase(suite, tc_strncpy); 
 
     return suite; 
 }
