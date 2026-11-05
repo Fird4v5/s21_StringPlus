@@ -331,6 +331,38 @@ START_TEST(test_strncat_dest_empty) {
 }
 END_TEST
 
+// -----> strstr 
+
+START_TEST(test_strstr_basic) {
+    ck_assert_ptr_eq(s21_strstr("Hello World", "World"), strstr("Hello World", "World")); 
+}
+END_TEST
+
+START_TEST(test_strstr_no_match) {
+    ck_assert_ptr_null(s21_strstr("Hello World", "Java")); 
+}
+END_TEST
+
+START_TEST(test_strstr_empty_needle) {
+    ck_assert_ptr_eq(s21_strstr("Hello", ""), strstr("Hello", "")); 
+}
+END_TEST
+
+START_TEST(test_strstr_empty_haystack) {
+    ck_assert_ptr_null(s21_strstr("", "Hello")); 
+}
+END_TEST
+
+START_TEST(test_strstr_index_start) {
+    ck_assert_ptr_eq(s21_strstr("Hello World", "Hello"), strstr("Hello World", "Hello")); 
+}
+END_TEST
+
+START_TEST(test_strstr_multiple_matches) {
+    ck_assert_ptr_eq(s21_strstr("banana", "ana"), strstr("banana", "ana")); 
+}
+END_TEST
+
 
 // ===== SUITE / TCASE ===== 
 
@@ -345,6 +377,8 @@ Suite *s21_string_suite(void) {
     TCase *tc_strncmp = tcase_create("strncmp_tests"); 
     TCase *tc_strncpy = tcase_create("strncpy_tests"); 
     TCase *tc_strncat = tcase_create("strncat_tests"); 
+    TCase *tc_strstr = tcase_create("strstr_tests"); 
+
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
     tcase_add_test(tc_strlen, test_strlen_empty);
@@ -394,6 +428,13 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strncat, test_strncat_src_empty); 
     tcase_add_test(tc_strncat, test_strncat_dest_empty); 
 
+    tcase_add_test(tc_strstr, test_strstr_basic); 
+    tcase_add_test(tc_strstr, test_strstr_no_match); 
+    tcase_add_test(tc_strstr, test_strstr_empty_needle); 
+    tcase_add_test(tc_strstr, test_strstr_empty_haystack); 
+    tcase_add_test(tc_strstr, test_strstr_index_start); 
+    tcase_add_test(tc_strstr, test_strstr_multiple_matches);
+
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
     suite_add_tcase(suite, tc_strrchr);
@@ -401,6 +442,7 @@ Suite *s21_string_suite(void) {
     suite_add_tcase(suite, tc_strncmp);  
     suite_add_tcase(suite, tc_strncpy); 
     suite_add_tcase(suite, tc_strncat); 
+    suite_add_tcase(suite, tc_strstr); 
 
     return suite; 
 }

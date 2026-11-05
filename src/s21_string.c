@@ -165,4 +165,30 @@ char *s21_strncat(char *dest, const char *src , s21_size num) {
 
 }
 
+// ===== 8. STRSTR =====
+
+char *s21_strstr(const char *haystack, const char *needle) {
+
+  if (*needle == '\0') {
+    return (char *)haystack; 
+  }
+
+  s21_size i = 0; 
+  while (haystack[i] != '\0') {
+
+    s21_size j = 0; 
+    while (needle[j] != '\0' && haystack[i + j] == needle[j]) {
+      j++; 
+    }
+    
+    if (needle[j] == '\0') {
+      return (char *)&haystack[i]; 
+    }
+    
+    i++;
+  }
+
+  return S21_NULL; 
+
+}
 
