@@ -141,3 +141,28 @@ char *s21_strncpy(char *dest, const char *src, s21_size num) {
 
 }
 
+// ===== 7. STRNCAT =====
+
+char *s21_strncat(char *dest, const char *src , s21_size num) {
+
+  s21_size i = 0; 
+
+  while (dest[i] != '\0') {
+    i++; 
+  }
+
+  s21_size j = 0; 
+
+  while (j < num && src[j] != '\0') {
+    dest[i] = src[j]; 
+    i++; 
+    j++; 
+  }
+
+  dest[i] = '\0'; 
+
+  return dest; 
+
+}
+
+

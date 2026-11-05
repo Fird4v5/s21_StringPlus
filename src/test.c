@@ -188,8 +188,6 @@ END_TEST
 
 // -----> strncpy 
 
-
-
 START_TEST(test_strncpy_equal_size) {
 
     char actual[10] = {0}; 
@@ -272,6 +270,67 @@ START_TEST(test_strncpy_no_extra_null) {
 }
 END_TEST
 
+// -----> strncat 
+
+START_TEST(test_strncat_basic) {
+
+    char actual[20] = "Hello"; 
+
+    ck_assert_str_eq(s21_strncat(actual, " World", 6), "Hello World"); 
+
+}
+END_TEST
+
+START_TEST(test_strncat_limited) {
+
+    char actual[20] = "Hello"; 
+    char expected[20] = "Hello";  
+
+    ck_assert_str_eq(s21_strncat(actual, "World", 3), strncat(expected, "World", 3)); 
+
+}
+END_TEST 
+
+START_TEST(test_strncat_src_shorter) {
+
+    char actual[20] = "Hello"; 
+    char expected[20] = "Hello";  
+
+    ck_assert_str_eq(s21_strncat(actual, "Hi", 10), strncat(expected, "Hi", 10)); 
+
+}
+END_TEST
+
+START_TEST(test_strncat_zero_limit) {
+
+    char actual[20] = "Hello"; 
+    char expected[20] = "Hello";  
+
+    ck_assert_str_eq(s21_strncat(actual, "World", 0), strncat(expected, "World", 0)); 
+
+}
+END_TEST
+
+
+START_TEST(test_strncat_src_empty) {
+
+    char actual[20] = "Hello"; 
+    char expected[20] = "Hello";
+    
+    ck_assert_str_eq(s21_strncat(actual, "", 5), strncat(expected, "", 5)); 
+
+}
+END_TEST
+
+START_TEST(test_strncat_dest_empty) {
+
+    char actual[20] = ""; 
+
+    ck_assert_str_eq(s21_strncat(actual, "Hello", 5), "Hello"); 
+
+}
+END_TEST
+
 
 // ===== SUITE / TCASE ===== 
 
@@ -285,6 +344,7 @@ Suite *s21_string_suite(void) {
     TCase *tc_strcmp = tcase_create("strcmp_tests"); 
     TCase *tc_strncmp = tcase_create("strncmp_tests"); 
     TCase *tc_strncpy = tcase_create("strncpy_tests"); 
+    TCase *tc_strncat = tcase_create("strncat_tests"); 
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
     tcase_add_test(tc_strlen, test_strlen_empty);
@@ -327,12 +387,20 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strncpy, test_strncpy_src_empty);
     tcase_add_test(tc_strncpy, test_strncpy_no_extra_null);
 
+    tcase_add_test(tc_strncat, test_strncat_basic); 
+    tcase_add_test(tc_strncat, test_strncat_limited); 
+    tcase_add_test(tc_strncat, test_strncat_src_shorter); 
+    tcase_add_test(tc_strncat, test_strncat_zero_limit); 
+    tcase_add_test(tc_strncat, test_strncat_src_empty); 
+    tcase_add_test(tc_strncat, test_strncat_dest_empty); 
+
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
     suite_add_tcase(suite, tc_strrchr);
     suite_add_tcase(suite, tc_strcmp); 
     suite_add_tcase(suite, tc_strncmp);  
     suite_add_tcase(suite, tc_strncpy); 
+    suite_add_tcase(suite, tc_strncat); 
 
     return suite; 
 }
