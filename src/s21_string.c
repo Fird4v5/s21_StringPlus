@@ -192,3 +192,40 @@ char *s21_strstr(const char *haystack, const char *needle) {
 
 }
 
+// ===== 9. STRTOK ===== 
+
+char *s21_strtok(char *str, const char *delim) {
+
+  static char *next_position = S21_NULL; 
+
+  if (str != S21_NULL) {
+    next_position = str; 
+  } else if (next_position == S21_NULL) {
+    return S21_NULL; 
+  }
+
+  while (*next_position != '\0' && s21_strchr(delim, *next_position) != S21_NULL) {
+    next_position++; 
+  }
+
+  if (*next_position == '\0') {
+    next_position = S21_NULL; 
+    return S21_NULL; 
+  }
+
+  char *token = next_position; 
+
+  while (*next_position != '\0' && s21_strchr(delim, *next_position) == S21_NULL) {
+    next_position++; 
+  }
+
+  if (*next_position == '\0') {
+    next_position = S21_NULL; 
+  } else {
+    *next_position = '\0'; 
+    next_position++; 
+  }
+
+  return token; 
+
+}

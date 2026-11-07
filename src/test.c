@@ -363,6 +363,193 @@ START_TEST(test_strstr_multiple_matches) {
 }
 END_TEST
 
+// -----> strtok
+
+START_TEST(test_strtok_basic) {
+
+    char actual[] = "apple,banana,grape"; 
+    char expected[] = "apple,banana,grape"; 
+
+    char *actual_token = s21_strtok(actual, ","); 
+    char *expected_token = strtok(expected, ","); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ","); 
+    expected_token = strtok(S21_NULL, ","); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ","); 
+    expected_token = strtok(S21_NULL, ","); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ","); 
+    expected_token = strtok(S21_NULL, ","); 
+
+    ck_assert_ptr_null(actual_token); 
+    ck_assert_ptr_null(expected_token); 
+
+}
+END_TEST
+
+START_TEST(test_strtok_multiple_delim) {
+
+    char actual[] = "apple,banana:grape"; 
+    char expected[] = "apple,banana:grape"; 
+
+    char *actual_token = s21_strtok(actual, ",:"); 
+    char *expected_token = strtok(expected, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_ptr_null(actual_token); 
+    ck_assert_ptr_null(expected_token); 
+
+}
+END_TEST
+
+START_TEST(test_strtok_consecutive_delim) {
+
+    char actual[] = ",:,:,apple,banana:grape"; 
+    char expected[] = ",:,:,apple,banana:grape"; 
+
+    char *actual_token = s21_strtok(actual, ",:"); 
+    char *expected_token = strtok(expected, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_ptr_null(actual_token); 
+    ck_assert_ptr_null(expected_token); 
+
+}
+END_TEST
+
+START_TEST(test_strtok_lead_trail_delim) {
+
+    char actual[] = ",:,:,apple,banana:grape:,:,:"; 
+    char expected[] = ",:,:,apple,banana:grape:,:,:"; 
+
+    char *actual_token = s21_strtok(actual, ",:"); 
+    char *expected_token = strtok(expected, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, ",:"); 
+    expected_token = strtok(S21_NULL, ",:"); 
+
+    ck_assert_ptr_null(actual_token); 
+    ck_assert_ptr_null(expected_token); 
+
+}
+END_TEST
+
+START_TEST(test_strtok_str_empty) {
+
+    char actual[] = ""; 
+    char expected[] = ""; 
+
+    char *actual_token = s21_strtok(actual, ",:"); 
+    char *expected_token = strtok(expected, ",:"); 
+
+    ck_assert_ptr_null(actual_token); 
+    ck_assert_ptr_null(expected_token); 
+
+}
+END_TEST
+
+START_TEST(test_strtok_delim_empty) {
+
+    char actual[] = ",:,:,apple,banana:grape"; 
+    char expected[] = ",:,:,apple,banana:grape"; 
+
+    char *actual_token = s21_strtok(actual, ""); 
+    char *expected_token = strtok(expected, ""); 
+
+    ck_assert_str_eq(actual_token, expected_token); 
+
+    actual_token = s21_strtok(S21_NULL, "");
+    expected_token = strtok(S21_NULL, "");
+
+    ck_assert_ptr_null(actual_token);
+    ck_assert_ptr_null(expected_token);
+
+}
+END_TEST
+
+START_TEST(test_strtok_only_delims) {
+
+    char actual[] = ",:,:,:";
+    char expected[] = ",:,:,:";
+
+    char *actual_token = s21_strtok(actual, ",:");
+    char *expected_token = strtok(expected, ",:");
+
+    ck_assert_ptr_null(actual_token);
+    ck_assert_ptr_null(expected_token);
+
+}
+END_TEST
+
+START_TEST(test_strtok_restart) {
+
+    char actual1[] = "apple,banana";
+    char expected1[] = "apple,banana";
+
+    char actual2[] = "red,blue";
+    char expected2[] = "red,blue";
+
+    char *actual_token = s21_strtok(actual1, ",");
+    char *expected_token = strtok(expected1, ",");
+
+    ck_assert_str_eq(actual_token, expected_token);
+
+    actual_token = s21_strtok(actual2, ",");
+    expected_token = strtok(expected2, ",");
+
+    ck_assert_str_eq(actual_token, expected_token);
+
+}
+END_TEST
+
+
 
 // ===== SUITE / TCASE ===== 
 
@@ -378,6 +565,7 @@ Suite *s21_string_suite(void) {
     TCase *tc_strncpy = tcase_create("strncpy_tests"); 
     TCase *tc_strncat = tcase_create("strncat_tests"); 
     TCase *tc_strstr = tcase_create("strstr_tests"); 
+    TCase *tc_strtok = tcase_create("strtok_tests"); 
 
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
@@ -435,6 +623,15 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strstr, test_strstr_index_start); 
     tcase_add_test(tc_strstr, test_strstr_multiple_matches);
 
+    tcase_add_test(tc_strtok, test_strtok_basic); 
+    tcase_add_test(tc_strtok, test_strtok_multiple_delim); 
+    tcase_add_test(tc_strtok, test_strtok_consecutive_delim); 
+    tcase_add_test(tc_strtok, test_strtok_lead_trail_delim); 
+    tcase_add_test(tc_strtok, test_strtok_str_empty);
+    tcase_add_test(tc_strtok, test_strtok_delim_empty);  
+    tcase_add_test(tc_strtok, test_strtok_only_delims); 
+    tcase_add_test(tc_strtok, test_strtok_restart); 
+
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
     suite_add_tcase(suite, tc_strrchr);
@@ -442,7 +639,8 @@ Suite *s21_string_suite(void) {
     suite_add_tcase(suite, tc_strncmp);  
     suite_add_tcase(suite, tc_strncpy); 
     suite_add_tcase(suite, tc_strncat); 
-    suite_add_tcase(suite, tc_strstr); 
+    suite_add_tcase(suite, tc_strstr);
+    suite_add_tcase(suite, tc_strtok);  
 
     return suite; 
 }
