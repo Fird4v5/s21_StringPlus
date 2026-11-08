@@ -249,3 +249,21 @@ s21_size s21_strcspn(const char *str1, const char *str2) {
   return count; 
 
 }
+
+// ===== 11. STRPBRK ===== 
+
+char *s21_strpbrk(const char *str1, const char *str2) {
+
+  s21_size i = 0; 
+  
+  while (str1[i] != '\0') {
+    if (s21_strchr(str2, str1[i]) != S21_NULL) {
+      return (char *)&str1[i]; 
+    } else {
+      i++; 
+    }
+  }
+
+  return S21_NULL; 
+
+}
