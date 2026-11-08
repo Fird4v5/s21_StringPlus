@@ -229,3 +229,23 @@ char *s21_strtok(char *str, const char *delim) {
   return token; 
 
 }
+
+// ===== 10. STRCSPN =====
+
+s21_size s21_strcspn(const char *str1, const char *str2) {
+
+  s21_size count = 0; 
+  
+  while (str1[count] != '\0') {
+
+    if (s21_strchr(str2, str1[count]) == S21_NULL) {
+       count++; 
+    } else { 
+      return count; 
+    }
+
+  }
+
+  return count; 
+
+}

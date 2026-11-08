@@ -20,6 +20,7 @@ char *s21_strncpy(char *dest, const char *src, s21_size num);
 char *s21_strncat(char *dest, const char *src , s21_size num); 
 char *s21_strstr(const char *haystack, const char *needle); 
 char *s21_strtok(char *str, const char *delim); 
+s21_size s21_strcspn(const char *str1, const char *str2); 
 
 
 #endif

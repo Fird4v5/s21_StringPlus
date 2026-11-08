@@ -549,7 +549,47 @@ START_TEST(test_strtok_restart) {
 }
 END_TEST
 
+// -----> strcspn
 
+START_TEST(test_strcspn_basic) {
+    ck_assert_uint_eq(s21_strcspn("hello", "world"), strcspn("hello", "world")); 
+}
+END_TEST
+
+START_TEST(test_strcspn_not_found) {
+    ck_assert_uint_eq(s21_strcspn("abcdef", "xyz"), strcspn("abcdef", "xyz")); 
+}
+END_TEST 
+
+START_TEST(test_strcspn_one_char) {
+    ck_assert_uint_eq(s21_strcspn("abcdef", "c"), strcspn("abcdef", "c")); 
+}
+END_TEST
+
+START_TEST(test_strcspn_first_char) {
+    ck_assert_uint_eq(s21_strcspn("abcdef", "a"), strcspn("abcdef", "a")); 
+}
+END_TEST 
+
+START_TEST(test_strcspn_last_char) {
+    ck_assert_uint_eq(s21_strcspn("hello", "o"), strcspn("hello", "o"));
+}
+END_TEST
+
+START_TEST(test_strcspn_str2_empty) {
+    ck_assert_uint_eq(s21_strcspn("hello", ""), strcspn("hello", "")); 
+}
+END_TEST
+
+START_TEST(test_strcspn_str1_empty) {
+    ck_assert_uint_eq(s21_strcspn("", "hello"), strcspn("", "hello")); 
+}
+END_TEST
+
+START_TEST(test_strcspn_both_strs_empty) {
+    ck_assert_uint_eq(s21_strcspn("", ""), strcspn("", "")); 
+}
+END_TEST 
 
 // ===== SUITE / TCASE ===== 
 
@@ -566,7 +606,7 @@ Suite *s21_string_suite(void) {
     TCase *tc_strncat = tcase_create("strncat_tests"); 
     TCase *tc_strstr = tcase_create("strstr_tests"); 
     TCase *tc_strtok = tcase_create("strtok_tests"); 
-
+    TCase *tc_strcspn = tcase_create("strcspn_tests"); 
 
     tcase_add_test(tc_strlen, test_strlen_basic); 
     tcase_add_test(tc_strlen, test_strlen_empty);
@@ -632,6 +672,15 @@ Suite *s21_string_suite(void) {
     tcase_add_test(tc_strtok, test_strtok_only_delims); 
     tcase_add_test(tc_strtok, test_strtok_restart); 
 
+    tcase_add_test(tc_strcspn, test_strcspn_basic); 
+    tcase_add_test(tc_strcspn, test_strcspn_not_found);
+    tcase_add_test(tc_strcspn, test_strcspn_one_char);  
+    tcase_add_test(tc_strcspn, test_strcspn_first_char);
+    tcase_add_test(tc_strcspn, test_strcspn_last_char); 
+    tcase_add_test(tc_strcspn, test_strcspn_str2_empty);  
+    tcase_add_test(tc_strcspn, test_strcspn_str1_empty); 
+    tcase_add_test(tc_strcspn, test_strcspn_both_strs_empty); 
+
     suite_add_tcase(suite, tc_strlen); 
     suite_add_tcase(suite, tc_strchr); 
     suite_add_tcase(suite, tc_strrchr);
@@ -640,7 +689,8 @@ Suite *s21_string_suite(void) {
     suite_add_tcase(suite, tc_strncpy); 
     suite_add_tcase(suite, tc_strncat); 
     suite_add_tcase(suite, tc_strstr);
-    suite_add_tcase(suite, tc_strtok);  
+    suite_add_tcase(suite, tc_strtok); 
+    suite_add_tcase(suite, tc_strcspn);  
 
     return suite; 
 }
